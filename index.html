@@ -247,8 +247,8 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   #sb,#sb-toggle{display:none!important;}
   #plbl{display:inline-flex!important;width:auto!important;min-width:0!important;max-width:calc(100vw - 120px)!important;}
   /* Legend wraps on mobile */
-  #legend{height:auto!important;overflow:hidden!important;}
-  #legend-stub{flex-wrap:wrap!important;white-space:normal!important;height:auto!important;padding:3px 8px!important;gap:4px!important;transform:none!important;will-change:auto!important;}
+  #legend{height:auto!important;overflow:hidden!important;position:sticky!important;right:0!important;left:0!important;}
+  #legend-stub{flex-wrap:wrap!important;white-space:normal!important;height:auto!important;padding:3px 8px!important;gap:4px!important;will-change:auto!important;}
   #tb{padding:0 8px;gap:6px;}
   .sc-acts,.dh{display:none!important;}
   .md{width:95vw!important;max-width:95vw!important;}
@@ -2519,7 +2519,7 @@ function renderLegend(){
           +'</div>';
       }).join('');
     }
-    leg.innerHTML='<div id="legend-stub" style="display:flex;flex-direction:column;gap:2px;padding:3px 8px;align-items:flex-start;width:100%;">'
+    leg.innerHTML='<div id="legend-stub" style="display:flex;flex-direction:column;gap:2px;padding:3px 8px;align-items:flex-start;width:100vw;">'
       +'<div style="display:flex;align-items:center;gap:4px;justify-content:flex-start;">'+mkItems(row1)+'</div>'
       +(row2.length?'<div style="display:flex;align-items:center;gap:4px;justify-content:flex-start;">'+mkItems(row2)+'</div>':'')
       +'</div>';
@@ -3658,7 +3658,7 @@ setTimeout(function(){renderIconGrid(ICONS[0]);},200);
     for(var i=0;i<_hsEls.length;i++)_hsEls[i].style.transform=t;
     for(var i=0;i<_ovEls.length;i++)_ovEls[i].style.transform=t;
     var ls=document.getElementById('legend-stub');
-    if(ls&&!isMobile())ls.style.transform=t;
+    if(ls)ls.style.transform=t;
   }
 
   // Invalidate cache after every render
