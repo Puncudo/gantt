@@ -542,19 +542,19 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <!-- Start row (always visible) -->
       <div class="fr" style="gap:6px;margin-bottom:6px">
         <div style="font-size:10px;font-weight:700;color:var(--text3);width:44px;padding-top:6px">התחלה</div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שנה</label><input type="number" id="sy" min="2020" max="2040" value="2025" style="padding:5px 7px"/></div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">Q</label><select id="sq" onchange="fmSel('sm',+this.value);onDurChange()" style="padding:5px 7px"><option value="1">Q1</option><option value="2">Q2</option><option value="3">Q3</option><option value="4">Q4</option></select></div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">חודש</label><select id="sm" onchange="onDurChange()" style="padding:5px 7px"></select></div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שבוע</label><select id="sw" onchange="onDurChange()" style="padding:5px 7px"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שנה</label><select id="sy" onchange="onStartChange()" style="padding:5px 7px"><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option></select></div>
+        <div class="fi" style="margin:0;flex:1;display:none"><label style="font-size:9px">Q</label><select id="sq" style="padding:5px 7px"><option value="1">Q1</option><option value="2">Q2</option><option value="3">Q3</option><option value="4">Q4</option></select></div>
+        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">חודש</label><select id="sm" onchange="syncQFromM('sq','sm');onStartChange()" style="padding:5px 7px"></select></div>
+        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שבוע</label><select id="sw" onchange="onStartChange()" style="padding:5px 7px"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
       </div>
 
       <!-- End row — shown in range mode -->
       <div id="end-row" class="fr" style="gap:6px">
         <div style="font-size:10px;font-weight:700;color:var(--text3);width:44px;padding-top:6px">סיום</div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שנה</label><input type="number" id="ey" min="2020" max="2040" value="2025" style="padding:5px 7px"/></div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">Q</label><select id="eq" onchange="fmSel('em',+this.value)" style="padding:5px 7px"><option value="1">Q1</option><option value="2">Q2</option><option value="3">Q3</option><option value="4">Q4</option></select></div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">חודש</label><select id="em" style="padding:5px 7px"></select></div>
-        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שבוע</label><select id="ew" style="padding:5px 7px"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
+        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שנה</label><select id="ey" onchange="filterEndFields()" style="padding:5px 7px"><option value="2020">2020</option><option value="2021">2021</option><option value="2022">2022</option><option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option><option value="2031">2031</option><option value="2032">2032</option><option value="2033">2033</option><option value="2034">2034</option><option value="2035">2035</option><option value="2036">2036</option><option value="2037">2037</option><option value="2038">2038</option><option value="2039">2039</option><option value="2040">2040</option></select></div>
+        <div class="fi" style="margin:0;flex:1;display:none"><label style="font-size:9px">Q</label><select id="eq" style="padding:5px 7px"><option value="1">Q1</option><option value="2">Q2</option><option value="3">Q3</option><option value="4">Q4</option></select></div>
+        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">חודש</label><select id="em" onchange="syncQFromM('eq','em');filterEndFields()" style="padding:5px 7px"></select></div>
+        <div class="fi" style="margin:0;flex:1"><label style="font-size:9px">שבוע</label><select id="ew" onchange="filterEndFields()" style="padding:5px 7px"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>
       </div>
 
       <!-- Duration row — shown in duration mode -->
@@ -2352,8 +2352,94 @@ function onDC(e){var m=document.getElementById('expmenu');if(m.classList.contain
 function tDD(){document.getElementById('expmenu').classList.toggle('open');}
 
 function fmSel(selId,q){
+  // Now always show all 12 months; q param ignored for sm/em but kept for compat
   var sel=document.getElementById(selId);if(!sel)return;
-  sel.innerHTML=QM[q].map(function(mi,i){return'<option value="'+(i+1)+'">'+MO[mi]+'</option>';}).join('');
+  sel.innerHTML=MO.map(function(name,i){return'<option value="'+(i+1)+'">'+(i+1)+' - '+name+'</option>';}).join('');
+}
+function syncQFromM(qId,mId){
+  var mSel=document.getElementById(mId);
+  var qSel=document.getElementById(qId);
+  if(!mSel||!qSel)return;
+  var m=parseInt(mSel.value)||1;
+  var q=Math.ceil(m/3)||1;
+  qSel.value=q;
+}
+
+function _getStartAbs(){
+  var sy=+document.getElementById('sy').value;
+  var _smG=+document.getElementById('sm').value;
+  var sq=Math.ceil(_smG/3)||1; var sm=_smG-(sq-1)*3||1;
+  var sw=+document.getElementById('sw').value;
+  return aw(sy,sq,sm,sw);
+}
+
+function onStartChange(){
+  onDurChange();
+  filterEndFields();
+}
+
+function filterEndFields(preserveEnd){
+  var startAbs=_getStartAbs();
+  var sy=+document.getElementById('sy').value;
+  var eySel=document.getElementById('ey');
+  var emSel=document.getElementById('em');
+  var ewSel=document.getElementById('ew');
+  if(!eySel||!emSel||!ewSel)return;
+
+  var curEY=+eySel.value||sy;
+  var curEM=+emSel.value||1;
+  var curEW=+ewSel.value||1;
+
+  // Rebuild ey options — disable years before start year
+  var eyOpts='';
+  for(var y=2020;y<=2040;y++){
+    var dis=y<sy?' disabled':'';
+    eyOpts+='<option value="'+y+'"'+dis+'>'+y+'</option>';
+  }
+  eySel.innerHTML=eyOpts;
+  // Restore ey — clamp to start year minimum
+  eySel.value=Math.max(sy,curEY);
+  var ey=+eySel.value;
+
+  // Rebuild em options — disable months that make end < start
+  var emOpts='';
+  for(var mi=1;mi<=12;mi++){
+    var mq=Math.ceil(mi/3); var ml=mi-(mq-1)*3;
+    var testAbs=aw(ey,mq,ml,4);
+    var dis2=testAbs<startAbs?' disabled':'';
+    emOpts+='<option value="'+mi+'"'+dis2+'>'+mi+' - '+MO[mi-1]+'</option>';
+  }
+  emSel.innerHTML=emOpts;
+
+  // Restore or clamp em
+  var emVal=curEM;
+  var found=false;
+  for(var i=0;i<emSel.options.length;i++){
+    if(!emSel.options[i].disabled&&+emSel.options[i].value>=curEM){emVal=+emSel.options[i].value;found=true;break;}
+  }
+  if(!found)for(var i=0;i<emSel.options.length;i++){if(!emSel.options[i].disabled){emVal=+emSel.options[i].value;break;}}
+  emSel.value=emVal;
+  syncQFromM('eq','em');
+
+  // Rebuild ew options — disable weeks that make end < start
+  var _emGv=+emSel.value||1;
+  var _eqv=Math.ceil(_emGv/3)||1; var _emv=_emGv-(_eqv-1)*3||1;
+  var ewOpts='';
+  for(var w=1;w<=4;w++){
+    var testAbs2=aw(ey,_eqv,_emv,w);
+    var dis3=testAbs2<startAbs?' disabled':'';
+    ewOpts+='<option value="'+w+'"'+dis3+'>'+w+'</option>';
+  }
+  ewSel.innerHTML=ewOpts;
+
+  // Restore or clamp ew
+  var ewVal=curEW;
+  var found2=false;
+  for(var i=0;i<ewSel.options.length;i++){
+    if(!ewSel.options[i].disabled&&+ewSel.options[i].value>=curEW){ewVal=+ewSel.options[i].value;found2=true;break;}
+  }
+  if(!found2)for(var i=0;i<ewSel.options.length;i++){if(!ewSel.options[i].disabled){ewVal=+ewSel.options[i].value;break;}}
+  ewSel.value=ewVal;
 }
 
 function oPrj(isNew){
@@ -2554,8 +2640,9 @@ function onDMode(){
 function onDurChange(){
   if(!document.getElementById('dm-dur').checked)return;
   var sy=+document.getElementById('sy').value;
-  var sq=+document.getElementById('sq').value;
-  var sm=+document.getElementById('sm').value;
+  var _smG=+document.getElementById('sm').value;
+  var sq=Math.ceil(_smG/3)||1;var sm=_smG-(sq-1)*3||1;
+  document.getElementById('sq').value=sq;
   var sw=+document.getElementById('sw').value;
   var months=Math.max(0,+document.getElementById('dur-m').value||0);
   var weeks=Math.max(0,+document.getElementById('dur-w').value||0);
@@ -2568,11 +2655,11 @@ function onDurChange(){
   document.getElementById('ey').value=ep.year;
   document.getElementById('eq').value=ep.q;
   fmSel('em',ep.q);
-  document.getElementById('em').value=ep.m;
+  document.getElementById('em').value=(ep.q-1)*3+ep.m;
   document.getElementById('ew').value=ep.w;
   // Show result label - just the computed end date
   var res=document.getElementById('dur-result');
-  if(res)res.textContent='Q'+ep.q+' '+MO[QM[ep.q][ep.m-1]]+' שבוע '+ep.w+' '+ep.year;
+  var _gm=(ep.q-1)*3+ep.m;if(res)res.textContent='Q'+ep.q+' '+MO[_gm-1]+' שבוע '+ep.w+' '+ep.year;
 }
 
 function renderLegend(){
@@ -3001,8 +3088,17 @@ function oTk(tkId,scId,prePos){
       document.getElementById('tkper').value=tk.personId||'';
       swTk=tk.color||COLORS[0];
       swTkIsCustom=!!tk.color;
-      document.getElementById('sy').value=tk.sy;document.getElementById('sq').value=tk.sq;fmSel('sm',tk.sq);document.getElementById('sm').value=tk.sm;document.getElementById('sw').value=tk.sw;
-      document.getElementById('ey').value=tk.ey;document.getElementById('eq').value=tk.eq;fmSel('em',tk.eq);document.getElementById('em').value=tk.em;document.getElementById('ew').value=tk.ew;
+      document.getElementById('sy').value=tk.sy;document.getElementById('sq').value=tk.sq;fmSel('sm',tk.sq);document.getElementById('sm').value=(tk.sq-1)*3+tk.sm;document.getElementById('sw').value=tk.sw;
+      document.getElementById('ey').value=tk.ey;document.getElementById('eq').value=tk.eq;
+      var _tkEmG=(tk.eq-1)*3+tk.em;
+      filterEndFields();
+      document.getElementById('em').value=_tkEmG;syncQFromM('eq','em');
+      // rebuild ew after em is set so disabled is correct for this week
+      var _tkEqv=tk.eq,_tkEmv=tk.em;
+      var ewSel=document.getElementById('ew');
+      var startAbs2=_getStartAbs();
+      var ewHtml='';for(var _w=1;_w<=4;_w++){var _ta=aw(tk.ey,_tkEqv,_tkEmv,_w);ewHtml+='<option value="'+_w+'"'+(_ta<startAbs2?' disabled':'')+'>'+_w+'</option>';}
+      ewSel.innerHTML=ewHtml;ewSel.value=tk.ew;
       document.getElementById('tkdep').value=tk.depId||'';
       document.getElementById('ipr').value=tk.progress||0;document.getElementById('prv').textContent=(tk.progress||0)+'%';
       updProgBar(tk.progress||0);
@@ -3012,8 +3108,17 @@ function oTk(tkId,scId,prePos){
     document.getElementById('tktype').value=types[0]||'';document.getElementById('tkper').value='';
     swTk=COLORS[Math.floor(Math.random()*COLORS.length)];swTkIsCustom=false;
     var vq=getVQ();var d=prePos||{year:vq[0].year,q:vq[0].q,m:1,w:1};
-    document.getElementById('sy').value=d.year;document.getElementById('sq').value=d.q;fmSel('sm',d.q);document.getElementById('sm').value=d.m||1;document.getElementById('sw').value=d.w||1;
-    document.getElementById('ey').value=d.year;document.getElementById('eq').value=d.q;fmSel('em',d.q);document.getElementById('em').value=d.m||1;document.getElementById('ew').value=Math.min(4,(d.w||1)+1);
+    document.getElementById('sy').value=d.year;document.getElementById('sq').value=d.q;fmSel('sm',d.q);document.getElementById('sm').value=(d.q-1)*3+(d.m||1);document.getElementById('sw').value=d.w||1;
+    document.getElementById('ey').value=d.year;document.getElementById('eq').value=d.q;
+    var _dEmG=(d.q-1)*3+(d.m||1);
+    filterEndFields();
+    document.getElementById('em').value=_dEmG;syncQFromM('eq','em');
+    var _dEqv=d.q,_dEmv=d.m||1;
+    var ewSel2=document.getElementById('ew');
+    var startAbs3=_getStartAbs();
+    var ewW=Math.min(4,(d.w||1)+1);
+    var ewHtml2='';for(var _w2=1;_w2<=4;_w2++){var _ta2=aw(d.year,_dEqv,_dEmv,_w2);var _dis2=_ta2<startAbs3?' disabled':'';ewHtml2+='<option value="'+_w2+'"'+_dis2+'>'+_w2+'</option>';}
+    ewSel2.innerHTML=ewHtml2;ewSel2.value=ewW;
     document.getElementById('tkdep').value='';document.getElementById('ipr').value=0;document.getElementById('prv').textContent='0%';updProgBar(0);document.getElementById('itkno').value='';
     if(!scId&&p.scopes.length>0)eTkScId=p.scopes[0].id;
     else if(!scId){toast('יש ליצור תכולה');cMo('mo-tk');oSc();return;}
@@ -3066,7 +3171,11 @@ function sTk(){
   var ttype=document.getElementById('tktype').value||'';
   if(!ttype){toast('יש לבחור סוג משימה');return;}
   var depId=document.getElementById('tkdep').value||null;
-  var sy=+document.getElementById('sy').value,sq=+document.getElementById('sq').value,sm=+document.getElementById('sm').value,sw=+document.getElementById('sw').value;
+  var sy=+document.getElementById('sy').value;
+  var _smG=+document.getElementById('sm').value;var sq=Math.ceil(_smG/3);var sm=_smG-(sq-1)*3;
+  var sw=+document.getElementById('sw').value;
+  var _emG=+document.getElementById('em').value;var _eq=Math.ceil(_emG/3);var _em=_emG-(_eq-1)*3;
+  document.getElementById('eq').value=_eq;document.getElementById('em').value=_em;
   if(depId){
     var dep=findTk(p,depId);
     if(dep){var na=awT(dep,false)+1;var np=absToPos(na);sy=np.year;sq=np.q;sm=np.m;sw=np.w;}
@@ -3783,6 +3892,19 @@ setTimeout(function(){renderIconGrid(ICONS[0]);},200);
 
   gw.addEventListener('scroll',fixCols,{passive:true});
   window._fixCols=fixColsRefresh;
+
+  // During drag, reflows can knock out .rl transforms.
+  // Use lastSL (cached by fixCols on scroll) to avoid reading stale scrollLeft during reflow.
+  (function dragFixLoop(){
+    if(drag){
+      var t='translateX('+lastSL+'px)';
+      if(!_rlEls)_rlEls=document.querySelectorAll('.rl');
+      for(var i=0;i<_rlEls.length;i++){
+        if(_rlEls[i].style.transform!==t)_rlEls[i].style.transform=t;
+      }
+    }
+    requestAnimationFrame(dragFixLoop);
+  })();
 })();
 </script>
 </body>
