@@ -205,7 +205,9 @@
               "_track": 0
             }
           ],
-          "topicId": "mn2z9ai0peqjn"
+          "topicId": "mn2z9ai0peqjn",
+          "desc": "עוד תיאור לדוגמא",
+          "notes": "עוד הערה לדוגמא"
         },
         {
           "id": "64dab3cc632476d9c",
@@ -1737,7 +1739,7 @@
   "activeId": "64dab3cc73637a4c4",
   "pastel": 94,
   "barTextColor": "#222",
-  "_savedAt": "2026-03-31T14:30:57.767Z",
-  "_savedAtDisplay": "31.03.2026, 17:30",
+  "_savedAt": "2026-03-31T14:32:36.538Z",
+  "_savedAtDisplay": "31.03.2026, 17:32",
   "_ganttmator": true
 }
