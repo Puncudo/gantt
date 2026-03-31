@@ -138,7 +138,9 @@
               "_track": 0
             }
           ],
-          "topicId": "mn2zc5leizaqo"
+          "topicId": "mn2zc5leizaqo",
+          "desc": "תיאור לדוגמא",
+          "notes": "הערה לדוגמא"
         },
         {
           "id": "64dab3cc61e88c6da",
@@ -204,90 +206,6 @@
             }
           ],
           "topicId": "mn2z9ai0peqjn"
-        },
-        {
-          "id": "64dab3cc5da7cdb5b",
-          "name": "צ'קליסט משימות אוטומטיות",
-          "personId": null,
-          "tasks": [
-            {
-              "id": "64dab3cc5c9b5351c",
-              "name": "אפיון טכני",
-              "taskType": "אפיון טכני",
-              "personId": "mn2txb7n2natn",
-              "color": null,
-              "sy": 2026,
-              "sq": 1,
-              "sm": 3,
-              "sw": 1,
-              "ey": 2026,
-              "eq": 1,
-              "em": 3,
-              "ew": 4,
-              "depId": null,
-              "progress": 0,
-              "notes": "",
-              "_track": 0
-            },
-            {
-              "id": "64dab3cc5cd0230c8",
-              "name": "פיתוח",
-              "taskType": "פיתוח",
-              "personId": "mn2txz1yzhucz",
-              "color": null,
-              "sy": 2026,
-              "sq": 2,
-              "sm": 1,
-              "sw": 1,
-              "ey": 2026,
-              "eq": 2,
-              "em": 3,
-              "ew": 4,
-              "depId": null,
-              "progress": 0,
-              "notes": "תלויים בNG",
-              "_track": 0
-            },
-            {
-              "id": "64dab3cc5d1be7c35",
-              "name": "בדיקות",
-              "taskType": "בדיקות",
-              "personId": null,
-              "color": null,
-              "sy": 2026,
-              "sq": 2,
-              "sm": 3,
-              "sw": 1,
-              "ey": 2026,
-              "eq": 3,
-              "em": 1,
-              "ew": 4,
-              "depId": null,
-              "progress": 0,
-              "notes": "+ הסבות",
-              "_track": 1
-            },
-            {
-              "id": "64dab3cc5d5f23d62",
-              "name": "הטמעה והדרכה",
-              "taskType": "הטמעה והדרכה",
-              "personId": null,
-              "color": null,
-              "sy": 2026,
-              "sq": 3,
-              "sm": 2,
-              "sw": 1,
-              "ey": 2026,
-              "eq": 3,
-              "em": 2,
-              "ew": 4,
-              "depId": "64dab3cc5d1be7c35",
-              "progress": 0,
-              "notes": "",
-              "_track": 1
-            }
-          ],
-          "topicId": "mn2zaaorm4nhd"
         },
         {
           "id": "64dab3cc632476d9c",
@@ -594,6 +512,90 @@
             }
           ],
           "topicId": "mn2z9ai0peqjn"
+        },
+        {
+          "id": "64dab3cc5da7cdb5b",
+          "name": "צ'קליסט משימות אוטומטיות",
+          "personId": null,
+          "tasks": [
+            {
+              "id": "64dab3cc5c9b5351c",
+              "name": "אפיון טכני",
+              "taskType": "אפיון טכני",
+              "personId": "mn2txb7n2natn",
+              "color": null,
+              "sy": 2026,
+              "sq": 1,
+              "sm": 3,
+              "sw": 1,
+              "ey": 2026,
+              "eq": 1,
+              "em": 3,
+              "ew": 4,
+              "depId": null,
+              "progress": 0,
+              "notes": "",
+              "_track": 0
+            },
+            {
+              "id": "64dab3cc5cd0230c8",
+              "name": "פיתוח",
+              "taskType": "פיתוח",
+              "personId": "mn2txz1yzhucz",
+              "color": null,
+              "sy": 2026,
+              "sq": 2,
+              "sm": 1,
+              "sw": 1,
+              "ey": 2026,
+              "eq": 2,
+              "em": 3,
+              "ew": 4,
+              "depId": null,
+              "progress": 0,
+              "notes": "תלויים בNG",
+              "_track": 0
+            },
+            {
+              "id": "64dab3cc5d1be7c35",
+              "name": "בדיקות",
+              "taskType": "בדיקות",
+              "personId": null,
+              "color": null,
+              "sy": 2026,
+              "sq": 2,
+              "sm": 3,
+              "sw": 1,
+              "ey": 2026,
+              "eq": 3,
+              "em": 1,
+              "ew": 4,
+              "depId": null,
+              "progress": 0,
+              "notes": "+ הסבות",
+              "_track": 1
+            },
+            {
+              "id": "64dab3cc5d5f23d62",
+              "name": "הטמעה והדרכה",
+              "taskType": "הטמעה והדרכה",
+              "personId": null,
+              "color": null,
+              "sy": 2026,
+              "sq": 3,
+              "sm": 2,
+              "sw": 1,
+              "ey": 2026,
+              "eq": 3,
+              "em": 2,
+              "ew": 4,
+              "depId": "64dab3cc5d1be7c35",
+              "progress": 0,
+              "notes": "",
+              "_track": 1
+            }
+          ],
+          "topicId": "mn2zaaorm4nhd"
         },
         {
           "id": "64dab3cc5f76f1086",
@@ -1735,7 +1737,7 @@
   "activeId": "64dab3cc73637a4c4",
   "pastel": 94,
   "barTextColor": "#222",
-  "_savedAt": "2026-03-24T15:20:11.690Z",
-  "_savedAtDisplay": "24.03.2026, 17:20",
+  "_savedAt": "2026-03-31T14:30:57.767Z",
+  "_savedAtDisplay": "31.03.2026, 17:30",
   "_ganttmator": true
 }
