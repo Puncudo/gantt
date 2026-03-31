@@ -1759,7 +1759,12 @@ function dragDurationLabel(tk){
 }
 function showDragTT(e,label){
   var el=document.getElementById('drag-tt');if(!el)return;
-  el.textContent=label;el.style.display='block';moveDragTT(e);
+  el.textContent=label;
+  el.style.visibility='hidden';el.style.display='block';
+  // Force reflow so offsetWidth is correct before positioning
+  void el.offsetWidth;
+  el.style.visibility='';
+  moveDragTT(e);
 }
 function moveDragTT(e){
   var el=document.getElementById('drag-tt');if(!el||el.style.display==='none')return;
