@@ -9,6 +9,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap');
 :root{
@@ -28,10 +31,7 @@
 body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl}
 #tb{position:fixed;top:0;right:0;left:0;z-index:200;height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:0 16px;box-shadow:var(--sh)}
 .logo{font-size:19px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.pname{font-size:14px;font-weight:700;cursor:pointer;padding:4px 10px;border-radius:var(--rsm);transition:background .2s;width:var(--sw);min-width:var(--sw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-family:'Heebo',sans-serif;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:5px}
-.pname:hover{background:var(--surface2)}
-.pname::after{content:'▾';font-size:13px;color:var(--text2);flex-shrink:0;transition:color .2s;text-transform:none}
-.pname:hover::after{color:var(--text)}
+.pname{font-size:14px;font-weight:700;cursor:default;padding:4px 10px;border-radius:var(--rsm);transition:background .2s;width:var(--sw);min-width:var(--sw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-family:'Heebo',sans-serif;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:5px}
 .sp{flex:1}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:var(--rsm);font-family:'Heebo',sans-serif;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .2s;white-space:nowrap;height:32px}
 .bp{background:var(--accent);color:#fff}.bp:hover{filter:brightness(1.1)}
@@ -194,23 +194,32 @@ select[style*="padding:5px 7px"]{-webkit-appearance:none!important;appearance:no
 #legend .lg-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-left:4px}
 .lg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);white-space:nowrap}
 .lg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.lg-viewbtn{flex-shrink:0;display:flex;align-items:center;gap:4px;height:24px;padding:0 9px;margin:0 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text2);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.lg-viewbtn:hover{background:var(--surface2);border-color:var(--accent)}
+.lg-viewbtn.on{background:rgba(79,110,247,.12);border-color:var(--accent);color:var(--accent)}
+.vm-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--text)}
+.vm-row:hover{background:var(--surface2)}
+.vm-row input{margin:0;cursor:pointer;flex-shrink:0}
+.vm-tab{flex:1;padding:6px 4px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.vm-tab:hover{background:var(--surface2)}
+.vm-tab.on{background:rgba(79,110,247,.12);border-color:var(--accent);color:var(--accent)}
 .ick{width:36px;height:36px;border-radius:8px;border:2px solid transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .15s;background:var(--surface2)}
 .ick:hover{border-color:var(--accent);transform:scale(1.1)}
 .ick.sel{border-color:var(--accent);background:rgba(79,110,247,.12);transform:scale(1.08)}
 #toast{
-  position:fixed;bottom:24px;right:24px;
+  position:fixed;bottom:24px;left:50%;
   background:var(--surface);color:var(--text);
   padding:12px 14px;border-radius:12px;
   font-size:13px;font-weight:500;z-index:900;
   opacity:0;pointer-events:none;
   box-shadow:0 4px 24px rgba(0,0,0,.18),0 0 0 1px var(--border);
   display:flex;align-items:center;gap:10px;
-  transform:translateY(12px);
+  transform:translate(-50%,12px);
   transition:opacity .22s ease,transform .22s ease;
   min-width:220px;max-width:320px;
   direction:rtl;overflow:hidden;
 }
-#toast.on{opacity:1;transform:translateY(0);pointer-events:all}
+#toast.on{opacity:1;transform:translate(-50%,0);pointer-events:all}
 #toast-icon{font-size:16px;flex-shrink:0}
 #toast-msg{flex:1;line-height:1.3}
 #toast-undo{
@@ -232,6 +241,7 @@ select[style*="padding:5px 7px"]{-webkit-appearance:none!important;appearance:no
 #empty h2{font-size:19px;font-weight:700;color:var(--text2)}
 #empty p{font-size:13px;text-align:center;max-width:260px;line-height:1.6}
 #empty .btn{pointer-events:all}
+#fb-gantt-list,#fb-gantt-list *{pointer-events:all}
 #fab{position:fixed;bottom:26px;left:26px;z-index:90;width:50px;height:50px;border-radius:50%;background:var(--accent);color:#fff;border:none;cursor:pointer;font-size:22px;box-shadow:0 4px 18px rgba(79,110,247,.4);transition:all .2s;display:flex;align-items:center;justify-content:center}
 #fab:hover{transform:scale(1.1) rotate(12deg)}
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -264,12 +274,35 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 .gc.drag-col-e{box-shadow:inset 2px 0 0 rgba(59,130,246,.9);}
 .gc.drag-col-s.drag-col-e{box-shadow:inset -2px 0 0 rgba(59,130,246,.9),inset 2px 0 0 rgba(59,130,246,.9);}
 .drag-hdr{background:rgba(59,130,246,.18)!important;color:#3b82f6!important;font-weight:800!important;}
+
+/* Gantt Picker Cards */
+.gp-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .15s;text-align:right;position:relative;display:flex;align-items:center;gap:10px;flex:1 1 240px;min-width:240px;max-width:300px}
+.gp-card:hover{border-color:var(--accent);box-shadow:var(--shl);transform:translateY(-2px)}
+.gp-card-main{flex:1;min-width:0;display:flex;align-items:center;gap:10px}
+.gp-card-icon{font-size:26px;flex-shrink:0;line-height:1}
+.gp-card-text{min-width:0;flex:1}
+.gp-card-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gp-card-note{font-size:11px;color:var(--text2);margin-bottom:2px;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gp-card-info{font-size:11px;color:var(--text3)}
+.gp-card-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.gp-act-btn{background:var(--surface2);border:1px solid var(--border);border-radius:4px;width:26px;height:26px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.gp-act-btn:hover{border-color:var(--accent);background:rgba(79,110,247,.1)}
+.gp-act-del:hover{border-color:#ef4444;background:rgba(239,68,68,.1)}
+
+/* Version history in settings */
+.ver-list{max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--rsm);margin-top:8px}
+.ver-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.ver-item:last-child{border-bottom:none}
+.ver-item:hover{background:var(--surface2)}
+.ver-item-date{color:var(--text2);font-weight:500}
+.ver-item-btn{font-size:11px;padding:3px 8px;border-radius:4px;border:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--text2);transition:all .15s}
+.ver-item-btn:hover{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body data-theme="light">
 
 <div id="tb">
-  <div class="logo" style="display:flex;align-items:center;gap:8px">
+  <div class="logo" onclick="fbGoHome()" title="חזרה לרשימת הגאנטים" style="display:flex;align-items:center;gap:8px;cursor:pointer">
     <div style="display:inline-flex;flex-direction:column;align-items:stretch;gap:0;flex-shrink:0">
       <div style="font-family:'Heebo',sans-serif;font-size:16px;font-weight:700;background:none!important;-webkit-text-fill-color:#D4A017!important;color:#D4A017!important;letter-spacing:0.08em;text-align:justify;text-align-last:justify;line-height:0.8;margin-bottom:0px">שחר</div>
       <svg width="44" height="6" viewBox="0 0 44 6" xmlns="http://www.w3.org/2000/svg" style="display:block;margin-top:-1px;margin-left:3px">
@@ -281,7 +314,7 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div style="font-family:'Heebo',sans-serif;font-size:16px;font-weight:700;background:none!important;-webkit-text-fill-color:#1A5DA6!important;color:#1A5DA6!important;letter-spacing:-0.01em;text-align:justify;text-align-last:justify;line-height:0.8;margin-top:-2px">מיטב</div>
     </div>
   </div>
-  <span class="pname" id="plbl" onclick="oPrj()" style="display:none">בחר גאנט</span>
+  <span class="pname" id="plbl" style="display:none">בחר גאנט</span>
   <div class="sp"></div>
   <div id="qnav" style="display:none">
     <button onclick="shV(-1)" title="רבעון קודם" style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s" onmouseenter="this.style.background='var(--border)'" onmouseleave="this.style.background='transparent'">&#8249;</button>
@@ -304,6 +337,19 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
   </div>
   <button id="thbtn" onclick="tTh()">🌙</button>
   <button id="settingsbtn" onclick="oSettings()" style="width:32px;height:32px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">⚙️</button>
+  <!-- User button (always visible in top bar) -->
+  <div id="user-bar" style="display:none;position:relative">
+    <button id="user-btn" onclick="toggleUserMenu(event)" title="חשבון" style="display:flex;align-items:center;gap:7px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rsm);padding:3px 8px 3px 6px;cursor:pointer;font-family:inherit;color:var(--text);height:32px">
+      <img id="user-avatar" alt="" style="width:24px;height:24px;border-radius:50%;display:none;object-fit:cover;flex-shrink:0" onerror="this.style.display='none';var f=document.getElementById('user-avatar-fallback');if(f)f.style.display='flex'"/>
+      <span id="user-avatar-fallback" style="width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0"></span>
+      <span id="user-name" style="font-size:12px;font-weight:600;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;direction:ltr"></span>
+      <span style="font-size:9px;color:var(--text3)">▾</span>
+    </button>
+    <div id="user-menu" style="display:none;position:absolute;top:100%;left:0;margin-top:4px;min-width:180px;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shl);z-index:9000;overflow:hidden">
+      <div id="user-menu-email" style="padding:8px 12px;font-size:11px;color:var(--text3);border-bottom:1px solid var(--border);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <button onclick="fbSignOut()" style="width:100%;text-align:right;background:transparent;border:none;padding:9px 12px;font-size:13px;font-weight:600;color:#ef4444;cursor:pointer;font-family:inherit">התנתק</button>
+    </div>
+  </div>
 </div>
 
 <div id="app">
@@ -344,9 +390,10 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div style="border-top:1px solid var(--border);padding:8px 10px 10px;flex-shrink:0">
         <div id="last-saved" style="font-size:10px;color:var(--text3);margin-bottom:6px;text-align:center"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:4px">
-          <button class="btn bp" style="font-size:18px;padding:7px 0;justify-content:center" onclick="xJSON()" title="שמור גיבוי JSON">💾</button>
+          <button class="btn bp" style="font-size:18px;padding:7px 0;justify-content:center" onclick="fbSaveVersion()" title="שמור לענן">☁️</button>
+          <button class="btn bg" style="font-size:18px;padding:7px 0;justify-content:center" onclick="xJSON()" title="הורד JSON">💾</button>
           <button class="btn bg" style="font-size:18px;padding:7px 0;justify-content:center" onclick="iJSON()" title="טען מ-JSON">📂</button>
-          <button class="btn" style="grid-column:1/-1;font-size:12px;font-weight:700;padding:7px 0;justify-content:center;letter-spacing:.03em;background:transparent;color:#ef4444;border:1px solid var(--border)" onmouseenter="this.style.background='rgba(239,68,68,0.08)'" onmouseleave="this.style.background='transparent'" onclick="conf('איפוס מסך','כל הנתונים, הפרויקטים וההגדרות יימחקו לצמיתות. האם להמשיך?',function(){localStorage.removeItem('g5');location.reload();})" title="מחק הכל והתחל מחדש">↺ איפוס מסך</button>
+          <button class="btn" style="font-size:12px;font-weight:700;padding:7px 0;justify-content:center;letter-spacing:.03em;background:transparent;color:#ef4444;border:1px solid var(--border)" onmouseenter="this.style.background='rgba(239,68,68,0.08)'" onmouseleave="this.style.background='transparent'" onclick="conf('איפוס מסך','כל הנתונים, הפרויקטים וההגדרות יימחקו לצמיתות. האם להמשיך?',function(){localStorage.removeItem('g5');location.reload();})" title="מחק הכל והתחל מחדש">↺ איפוס</button>
         </div>
       </div>
     </div>
@@ -359,11 +406,11 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
     </div>
     <div id="empty">
       <div class="bi">📊</div>
-      <h2>ברוך הבא ל-Gantt</h2>
-      <p id="empty-sub">התחל גאנט חדש או טען קובץ גיבוי קיים</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-        <button class="btn bp" onclick="oPrj(true)">＋ גאנט חדש</button>
-        <button class="btn bg" onclick="iJSON()">📂 טען מ-JSON</button>
+      <h2>ברוכים הבאים</h2>
+      <p id="empty-sub">בחרו גאנט או צרו אחד חדש</p>
+      <div id="fb-gantt-list" style="margin-top:16px;width:100%;max-width:1100px"></div>
+      <div style="margin-top:18px;display:flex;justify-content:center">
+        <button class="btn bp" onclick="fbNewGantt()">＋ גאנט חדש</button>
       </div>
       <div id="empty-projects" style="margin-top:20px;display:none;width:100%;max-width:360px"></div>
     </div>
@@ -371,7 +418,48 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 </div>
 
 <div id="tt"></div>
+<!-- View / sort & legend-filter menu -->
+<div id="view-menu" style="display:none;position:fixed;z-index:600;background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:12px;width:266px;font-size:13px;color:var(--text)">
+  <div style="font-weight:700;margin-bottom:6px;color:var(--text2);font-size:11px;letter-spacing:.04em">סדר תצוגה</div>
+  <label class="vm-row"><input type="radio" name="vm-order" value="subject" onchange="setViewMode('subject')"><span>לפי נושא</span></label>
+  <label class="vm-row"><input type="radio" name="vm-order" value="timeline" onchange="setViewMode('timeline')"><span>ציר זמן (לפי משימה הכי מוקדמת)</span></label>
+  <div id="vm-timeline-opts" style="display:none;margin:6px 0 2px;padding:8px;border-radius:8px;background:var(--surface2)">
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <button id="vm-by-type" class="vm-tab" onclick="setTimelineBy('type')">סוג משימה</button>
+      <button id="vm-by-res" class="vm-tab" onclick="setTimelineBy('resource')">משאב</button>
+    </div>
+    <select id="vm-value" onchange="setTimelineValue(this.value)" style="width:100%;padding:7px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px"></select>
+  </div>
+  <div style="height:1px;background:var(--border);margin:12px 0"></div>
+  <div style="font-weight:700;margin-bottom:6px;color:var(--text2);font-size:11px;letter-spacing:.04em">סינון מקרא</div>
+  <label class="vm-row"><input type="radio" name="vm-legend" value="dim" onchange="setLegendMode('dim')"><span>הדגשה (האפרת השאר)</span></label>
+  <label class="vm-row"><input type="radio" name="vm-legend" value="hide" onchange="setLegendMode('hide')"><span>סינון (הסתרת השאר)</span></label>
+</div>
 <div id="sc-tt" style="position:fixed;z-index:601;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shl);padding:12px 14px;max-width:260px;pointer-events:none;display:none;font-size:12px;line-height:1.55;color:var(--text2)"></div>
+
+<!-- Edit Gantt modal -->
+<div class="mo" id="mo-gantt-edit" onclick="if(event.target===this)cMo('mo-gantt-edit')">
+  <div class="md" style="width:420px">
+    <div class="mdt" id="gantt-edit-title">עריכת גאנט <button class="mdc" onclick="cMo('mo-gantt-edit')">&#10005;</button></div>
+    <input type="hidden" id="gantt-edit-id"/>
+    <div class="fi">
+      <label>שם הגאנט</label>
+      <input type="text" id="gantt-edit-name" placeholder="שם הגאנט"/>
+    </div>
+    <div class="fi">
+      <label>אייקון</label>
+      <div id="gantt-icon-grid" style="display:flex;flex-wrap:wrap;gap:6px;max-height:132px;overflow:auto;padding:6px;background:var(--surface2);border-radius:var(--rsm)"></div>
+    </div>
+    <div class="fi">
+      <label>הערה</label>
+      <textarea id="gantt-edit-note" rows="3" placeholder="הערה (אופציונלי)"></textarea>
+    </div>
+    <div class="mdf">
+      <button class="btn bp" onclick="fbSaveGanttEdit()">שמור</button>
+      <button class="btn bg" onclick="cMo('mo-gantt-edit')">ביטול</button>
+    </div>
+  </div>
+</div>
 <!-- mobile scope info modal -->
 <div class="mo" id="mo-sc-info" onclick="if(event.target===this)cMo('mo-sc-info')">
   <div class="md" style="max-width:340px">
@@ -696,6 +784,15 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
       <div id="xls-settings-col" style="flex:1;min-width:0;border-right:1px solid var(--border);padding-right:24px">
         <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">הצגה באקסל</div>
         <div id="xls-cols"></div>
+
+        <!-- Version History -->
+        <div style="border-top:1px solid var(--border);margin-top:16px;padding-top:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">היסטוריית גרסאות</div>
+          <div id="ver-history" class="ver-list"><div style="padding:12px;text-align:center;color:var(--text3);font-size:12px">אין גרסאות שמורות</div></div>
+          <div style="margin-top:8px;display:flex;gap:6px">
+            <button class="btn bg bs" onclick="fbSwitchGantt()" style="font-size:11px">החלף גאנט</button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -762,7 +859,380 @@ input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;bac
 
 <input type="file" id="jimp" accept=".json" style="display:none" onchange="onJI(this)"/>
 
+<!-- ===== LOGIN GATE ===== -->
+<div id="auth-gate" style="position:fixed;inset:0;z-index:99999;background:var(--bg);display:none;align-items:center;justify-content:center;direction:rtl">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shl);padding:40px 44px;max-width:380px;width:90%;text-align:center">
+    <div style="font-size:40px;margin-bottom:8px">📊</div>
+    <h2 style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px">גאנט</h2>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:24px">יש להתחבר כדי להמשיך</p>
+    <button id="auth-signin-btn" onclick="fbSignIn()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1a1f36;border:1px solid #dadce0;border-radius:8px;padding:11px 16px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      התחברות עם Google
+    </button>
+    <div id="auth-error" style="color:#e5484d;font-size:13px;margin-top:14px;display:none"></div>
+  </div>
+</div>
+<!-- signed-in bar (top of sidebar) handled inside #sb-body -->
+
 <script>
+// ===== FIREBASE INIT =====
+var firebaseConfig = {
+  apiKey: "AIzaSyAkoLNvRaZ-KMQKG4S3C4xHnfMdlXS-1vU",
+  authDomain: "gantt-ba564.firebaseapp.com",
+  projectId: "gantt-ba564",
+  storageBucket: "gantt-ba564.firebasestorage.app",
+  messagingSenderId: "877666914760",
+  appId: "1:877666914760:web:0b61f58e8c7b13738770fd",
+  measurementId: "G-RZ52D4GP04"
+};
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore();
+var FB_MAX_VERSIONS = 15;
+var currentGanttId = localStorage.getItem('fbGanttId') || null;
+var currentGanttName = localStorage.getItem('fbGanttName') || '';
+
+// ===== AUTH (Google Sign-In) =====
+var auth = firebase.auth();
+/* ---- Access control (edit anytime) ----
+   FB_ALLOW_ALL = true  -> anyone who signs in with Google may use the app
+   FB_ALLOW_ALL = false -> only emails listed in FB_ALLOWED may use the app
+   FB_BANNED            -> these emails are ALWAYS blocked
+   NOTE: this is the in-app gate (UX). The REAL lock is the Firestore rule,
+   which must be kept in sync to truly restrict or ban access. */
+var FB_ALLOW_ALL = true;
+var FB_ALLOWED = [];   // e.g. ['alice@gmail.com','bob@company.com']
+var FB_BANNED  = [];   // e.g. ['blocked@gmail.com']
+function fbEmailAllowed(email){
+  email=(email||'').toLowerCase();
+  for(var i=0;i<FB_BANNED.length;i++){if(FB_BANNED[i].toLowerCase()===email)return false;}
+  if(FB_ALLOW_ALL)return true;
+  for(var j=0;j<FB_ALLOWED.length;j++){if(FB_ALLOWED[j].toLowerCase()===email)return true;}
+  return false;
+}
+var fbAuthUser=null;
+function fbSignIn(){
+  var err=document.getElementById('auth-error');if(err)err.style.display='none';
+  var provider=new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(function(e){
+    if(err){err.textContent='\u05E9\u05D2\u05D9\u05D0\u05EA \u05D4\u05EA\u05D7\u05D1\u05E8\u05D5\u05EA: '+(e&&e.message?e.message:e);err.style.display='block';}
+  });
+}
+function fbSignOut(){ closeUserMenu(); if(auth)auth.signOut(); }
+function toggleUserMenu(e){
+  if(e){e.stopPropagation();}
+  var m=document.getElementById('user-menu');if(!m)return;
+  if(m.style.display==='none'||!m.style.display){m.style.display='block';setTimeout(function(){document.addEventListener('click',closeUserMenu);},0);}
+  else{closeUserMenu();}
+}
+function closeUserMenu(){
+  var m=document.getElementById('user-menu');if(m)m.style.display='none';
+  document.removeEventListener('click',closeUserMenu);
+}
+function fbRenderUser(user){
+  var ub=document.getElementById('user-bar');if(!ub)return;
+  if(!user){ub.style.display='none';closeUserMenu();return;}
+  var nm=user.displayName||user.email||'';
+  var nmEl=document.getElementById('user-name');if(nmEl)nmEl.textContent=nm;
+  var emEl=document.getElementById('user-menu-email');if(emEl)emEl.textContent=user.email||'';
+  var av=document.getElementById('user-avatar');
+  var fb=document.getElementById('user-avatar-fallback');
+  if(user.photoURL&&av){av.src=user.photoURL;av.style.display='block';if(fb)fb.style.display='none';}
+  else{if(av)av.style.display='none';if(fb){fb.style.display='flex';fb.textContent=(nm.charAt(0)||'?').toUpperCase();}}
+  ub.style.display='block';
+}
+
+// ===== FIREBASE FUNCTIONS =====
+function fbSetCurrent(id,name){
+  currentGanttId=id;
+  currentGanttName=name||'';
+  if(id){
+    localStorage.setItem('fbGanttId',id);
+    localStorage.setItem('fbGanttName',currentGanttName);
+  }else{
+    localStorage.removeItem('fbGanttId');
+    localStorage.removeItem('fbGanttName');
+  }
+}
+
+// Return to the welcome/first screen
+function fbGoHome(){
+  fbSetCurrent(null,'');
+  document.querySelectorAll('.mo.open').forEach(function(m){m.classList.remove('open');});
+  S={projects:[],activeId:null,vs:{year:new Date().getFullYear(),q:1,numQ:4},theme:S.theme||'light',pastel:S.pastel||0};
+  save();
+  rAll();
+  fbShowPicker();
+}
+
+function fbLoadGanttList(){
+  return db.collection('gantts').get().then(function(snap){
+    var list=[];
+    snap.forEach(function(doc){list.push(Object.assign({id:doc.id},doc.data()));});
+    // Stable order by insertion (createdAt), not by last-updated date
+    list.sort(function(a,b){
+      var ta=a.createdAt&&a.createdAt.toMillis?a.createdAt.toMillis():0;
+      var tb=b.createdAt&&b.createdAt.toMillis?b.createdAt.toMillis():0;
+      return ta-tb;
+    });
+    return list;
+  });
+}
+
+function fbCreateGantt(name){
+  return db.collection('gantts').add({
+    name: name,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(ref){
+    fbSetCurrent(ref.id,name);
+    return ref.id;
+  });
+}
+
+function fbSaveVersion(silent){
+  if(!currentGanttId)return Promise.resolve();
+  var now=new Date();
+  var data=JSON.parse(JSON.stringify(S));
+  data._savedAt=now.toISOString();
+  // Update gantt's updatedAt
+  db.collection('gantts').doc(currentGanttId).update({updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  // Add version
+  return db.collection('gantts').doc(currentGanttId).collection('versions').add({
+    data: JSON.stringify(data),
+    savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    savedAtLocal: now.toISOString()
+  }).then(function(){
+    // Enforce max versions
+    return fbEnforceMaxVersions();
+  }).then(function(){
+    var ts=now.toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    updLastSaved(ts);
+    if(!silent)toast('נשמר לענן ☁️');
+  }).catch(function(e){
+    console.error('Firebase save error:',e);
+    toast('שגיאה בשמירה: '+e.message);
+  });
+}
+
+function fbEnforceMaxVersions(){
+  return db.collection('gantts').doc(currentGanttId).collection('versions')
+    .orderBy('savedAt','desc').get().then(function(snap){
+      var docs=[];
+      snap.forEach(function(d){docs.push(d);});
+      if(docs.length>FB_MAX_VERSIONS){
+        var toDelete=docs.slice(FB_MAX_VERSIONS);
+        var batch=db.batch();
+        toDelete.forEach(function(d){batch.delete(d.ref);});
+        return batch.commit();
+      }
+    });
+}
+
+function fbLoadLatestVersion(ganttId){
+  return db.collection('gantts').doc(ganttId).collection('versions')
+    .orderBy('savedAt','desc').limit(1).get().then(function(snap){
+      if(snap.empty)return null;
+      var doc=snap.docs[0];
+      var verData=doc.data();
+      return JSON.parse(verData.data);
+    });
+}
+
+function fbLoadVersion(ganttId,versionId){
+  return db.collection('gantts').doc(ganttId).collection('versions').doc(versionId).get().then(function(doc){
+    if(!doc.exists)return null;
+    return JSON.parse(doc.data().data);
+  });
+}
+
+function fbGetVersions(ganttId){
+  return db.collection('gantts').doc(ganttId||currentGanttId).collection('versions')
+    .orderBy('savedAt','desc').get().then(function(snap){
+      var list=[];
+      snap.forEach(function(doc){
+        var d=doc.data();
+        list.push({id:doc.id, savedAt:d.savedAtLocal||d.savedAt});
+      });
+      return list;
+    });
+}
+
+function fbShowPicker(){
+  // Load and display gantt list in the empty/welcome screen
+  var listEl=document.getElementById('fb-gantt-list');
+  if(!listEl)return;
+  listEl.innerHTML='<div style="text-align:center;color:var(--text3);font-size:12px">טוען גאנטים...</div>';
+  fbLoadGanttList().then(function(gantts){
+    if(!gantts.length){
+      listEl.innerHTML='';
+      return;
+    }
+    listEl.innerHTML='<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;text-align:center">גאנטים שמורים</div>';
+    var grid=document.createElement('div');
+    grid.style.cssText='display:flex;flex-wrap:wrap;gap:12px;justify-content:center';
+    gantts.forEach(function(g){
+      var card=document.createElement('div');
+      card.className='gp-card';
+      var dateStr='';
+      if(g.updatedAt&&g.updatedAt.toDate){
+        var d=g.updatedAt.toDate();
+        var datePart=d.toLocaleDateString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric'});
+        var timePart=d.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+        dateStr=datePart+' '+timePart;
+      }
+      // Main content (icon + text) on the right
+      var main=document.createElement('div');main.className='gp-card-main';
+      var iconDiv=document.createElement('div');iconDiv.className='gp-card-icon';iconDiv.textContent=g.icon||'📊';
+      var textWrap=document.createElement('div');textWrap.className='gp-card-text';
+      var nameDiv=document.createElement('div');nameDiv.className='gp-card-name';nameDiv.textContent=g.name;
+      textWrap.appendChild(nameDiv);
+      if(g.note){var noteDiv=document.createElement('div');noteDiv.className='gp-card-note';noteDiv.textContent=g.note;textWrap.appendChild(noteDiv);}
+      var infoDiv=document.createElement('div');infoDiv.className='gp-card-info';infoDiv.textContent=dateStr;infoDiv.style.direction='ltr';infoDiv.style.textAlign='right';
+      textWrap.appendChild(infoDiv);
+      main.appendChild(iconDiv);main.appendChild(textWrap);
+      // Action buttons on the left (stacked)
+      var acts=document.createElement('div');acts.className='gp-card-actions';
+      var btnEdit=document.createElement('button');btnEdit.className='gp-act-btn';btnEdit.textContent='✏️';btnEdit.title='ערוך';
+      var btnDel=document.createElement('button');btnDel.className='gp-act-btn gp-act-del';btnDel.textContent='🗑️';btnDel.title='מחק';
+      btnEdit.addEventListener('click',function(e){e.stopPropagation();fbEditGantt(g.id,g.name,g.note||'',g.icon||'');});
+      btnDel.addEventListener('click',function(e){e.stopPropagation();fbDeleteGantt(g.id,g.name);});
+      acts.appendChild(btnEdit);acts.appendChild(btnDel);
+      card.appendChild(main);card.appendChild(acts);
+      // Card click = load gantt
+      card.addEventListener('click',function(){
+        fbSetCurrent(g.id,g.name);
+        fbLoadLatestVersion(g.id).then(function(data){
+          if(data){
+            S=data;
+            if(!S.vs)S.vs={year:new Date().getFullYear(),q:1,numQ:4};
+            saveLocal();
+          }
+          rAll();
+          toast(g.name+' נטען ✓');
+        });
+      });
+      grid.appendChild(card);
+    });
+    listEl.appendChild(grid);
+  }).catch(function(e){
+    listEl.innerHTML='<div style="text-align:center;color:#ef4444;font-size:12px">שגיאה: '+e.message+'</div>';
+  });
+}
+
+function fbNewGantt(){
+  document.getElementById('gantt-edit-id').value='';
+  document.getElementById('gantt-edit-name').value='';
+  document.getElementById('gantt-edit-note').value='';
+  selGanttIcon='📊';
+  fbRenderGanttIcons(selGanttIcon);
+  var t=document.getElementById('gantt-edit-title');
+  if(t)t.firstChild.textContent='גאנט חדש ';
+  oMo('mo-gantt-edit');
+  setTimeout(function(){var n=document.getElementById('gantt-edit-name');if(n)n.focus();},50);
+}
+
+function fbEditGantt(id,name,note,icon){
+  document.getElementById('gantt-edit-id').value=id;
+  document.getElementById('gantt-edit-name').value=name||'';
+  document.getElementById('gantt-edit-note').value=note||'';
+  selGanttIcon=icon||'📊';
+  fbRenderGanttIcons(selGanttIcon);
+  var t=document.getElementById('gantt-edit-title');
+  if(t)t.firstChild.textContent='עריכת גאנט ';
+  oMo('mo-gantt-edit');
+}
+
+function fbSaveGanttEdit(){
+  var id=document.getElementById('gantt-edit-id').value;
+  var name=document.getElementById('gantt-edit-name').value.trim();
+  var note=document.getElementById('gantt-edit-note').value.trim();
+  if(!name){toast('יש להזין שם לגאנט');return;}
+  if(!id){
+    // Create a new gantt with a single empty project so the board is ready
+    db.collection('gantts').add({
+      name:name, note:note, icon:selGanttIcon,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    }).then(function(ref){
+      fbSetCurrent(ref.id,name);
+      var p={id:uid(),name:name,scopes:[],people:[],events:[],taskTypes:[],topics:[{id:NONE_ID,name:'ללא נושא',collapsed:false,isNone:true}]};
+      S={projects:[p],activeId:p.id,vs:{year:new Date().getFullYear(),q:1,numQ:4},theme:S.theme||'light',pastel:S.pastel||0};
+      saveLocal();
+      cMo('mo-gantt-edit');
+      rAll();
+      fbSaveVersion();
+      toast('הגאנט נוצר ✓');
+    }).catch(function(e){toast('שגיאה: '+e.message);});
+    return;
+  }
+  db.collection('gantts').doc(id).update({name:name,note:note,icon:selGanttIcon}).then(function(){
+    if(currentGanttId===id)fbSetCurrent(id,name);
+    cMo('mo-gantt-edit');
+    toast('עודכן ✓');
+    rAll();
+    fbShowPicker();
+  }).catch(function(e){toast('שגיאה: '+e.message);});
+}
+
+function fbDeleteGantt(id,name){
+  conf('מחיקת גאנט','האם למחוק את "'+name+'" לצמיתות? הפעולה בלתי הפיכה.',function(){
+    // Delete all versions first
+    db.collection('gantts').doc(id).collection('versions').get().then(function(snap){
+      var batch=db.batch();
+      snap.forEach(function(doc){batch.delete(doc.ref);});
+      return batch.commit();
+    }).then(function(){
+      return db.collection('gantts').doc(id).delete();
+    }).then(function(){
+      if(currentGanttId===id){fbGoHome();return;}
+      toast('הגאנט נמחק');
+      fbShowPicker();
+    });
+  });
+}
+
+function fbSwitchGantt(){
+  cMo('mo-settings');
+  fbGoHome();
+}
+
+function fbRenderVersionHistory(){
+  var el=document.getElementById('ver-history');
+  if(!el||!currentGanttId)return;
+  el.innerHTML='<div style="padding:12px;text-align:center;color:var(--text3);font-size:12px">טוען...</div>';
+  fbGetVersions(currentGanttId).then(function(versions){
+    if(!versions.length){
+      el.innerHTML='<div style="padding:12px;text-align:center;color:var(--text3);font-size:12px">אין גרסאות שמורות</div>';
+      return;
+    }
+    el.innerHTML='';
+    versions.forEach(function(v,i){
+      var date=v.savedAt?new Date(v.savedAt).toLocaleString('he-IL',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';
+      var item=document.createElement('div');
+      item.className='ver-item';
+      item.innerHTML='<span class="ver-item-date">'+(i===0?'נוכחי — ':'')+date+'</span>'+(i>0?'<button class="ver-item-btn" data-vid="'+v.id+'">טען</button>':'');
+      el.appendChild(item);
+    });
+    el.querySelectorAll('.ver-item-btn').forEach(function(btn){
+      btn.onclick=function(){
+        var vid=this.getAttribute('data-vid');
+        fbLoadVersion(currentGanttId,vid).then(function(data){
+          if(data){
+            S=data;
+            if(!S.vs)S.vs={year:new Date().getFullYear(),q:1,numQ:4};
+            saveLocal();
+            rAll();
+            cMo('mo-settings');
+            toast('גרסה נטענה ✓');
+          }
+        });
+      };
+    });
+  });
+}
+
+// ===== END FIREBASE =====
+
 var COLORS=['#ef4444','#f97316','#f59e0b','#ec4899','#db2777','#4f6ef7','#06b6d4','#0d9488','#7c3aed','#10b981','#84cc16','#78350f','#64748b'];
 var MO=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 var QM={1:[0,1,2],2:[3,4,5],3:[6,7,8],4:[9,10,11]};
@@ -864,16 +1334,25 @@ var activeTypeFilters=new Set(); // persisted filter — types to show
 var selectedScopes=new Set(); // clicked scopes to highlight
 var selectedTopics=new Set(); // clicked topics to highlight
 var activeColFilter=null; // {s,e} locked column range filter
+// View/sort mode (session-only, resets on reload)
+var viewMode='subject';      // 'subject' = grouped by topic | 'timeline' = flat, ordered by earliest matching mission
+var timelineBy='type';       // 'type' (taskType) | 'resource' (effective personId)
+var timelineValue='';        // chosen taskType string OR resource id
+var legendHideMode=false;    // false = הדגשה (dim non-matching) | true = סינון (hide non-matching)
 var panStart=null,panMoved=false;
 var ePerId=null,eScId=null,eTkId=null,eTkScId=null,eEvId=null;
 var tPhoto=null,swPer=COLORS[0],swTk=COLORS[0],swTkIsCustom=false;
 var pDragFrom=null,sDragFrom=null;
 
+var _initListenersAdded=false;
 function init(){
   // Set sidebar width immediately before any rendering
   document.documentElement.style.setProperty('--sw', isMobile()?'110px':'240px');
-  var s=localStorage.getItem('g5');
-  if(s){try{S=JSON.parse(s);}catch(e){}}
+  // Only load from localStorage if no Firebase gantt is active
+  if(!currentGanttId){
+    var s=localStorage.getItem('g5');
+    if(s){try{S=JSON.parse(s);}catch(e){}}
+  }
   if(!S.vs)S.vs={year:new Date().getFullYear(),q:1,numQ:4};
   if(!S.vs.numQ)S.vs.numQ=4;
   document.body.setAttribute('data-theme',S.theme||'light');
@@ -883,65 +1362,69 @@ function init(){
   // Set correct arrow direction on load
   var sb=document.getElementById('sb');
   if(sb)updSBArrow(sb.classList.contains('col'));
-  document.addEventListener('mousemove',onMM);
-  document.addEventListener('mouseup',onMU);
 
-  // Pan drag on background — mousedown on .gc only
-  var gw=document.getElementById('gw');
-  gw.addEventListener('mousedown',function(e){
-    if(!e.target.classList.contains('gc'))return;
-    panStart={x:e.clientX,y:e.clientY,sl:gw.scrollLeft,st:gw.scrollTop};
-    panMoved=false;
-    gw.style.cursor='grabbing';
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove',function(e){
-    if(!panStart)return;
-    var dx=e.clientX-panStart.x, dy=e.clientY-panStart.y;
-    if(Math.abs(dx)>3||Math.abs(dy)>3)panMoved=true;
-    gw.scrollLeft=panStart.sl-dx;
-    gw.scrollTop=panStart.st-dy;
-  });
-  document.addEventListener('mouseup',function(){
-    if(!panStart)return;
-    panStart=null;
-    gw.style.cursor='';
-  });
-  document.addEventListener('click',onDC);
-  document.addEventListener('keydown',function(e){
-    if(e.key==='Escape'){document.querySelectorAll('.mo.open').forEach(function(m){m.classList.remove('open');});cConf();}
-    if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();xJSON();}
-    if(e.key==='Enter'&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){
-      // Don't trigger on textarea or buttons
-      if(e.target.tagName==='TEXTAREA'||e.target.tagName==='BUTTON')return;
-      var open=document.querySelector('.mo.open');
-      if(!open)return;
+  if(!_initListenersAdded){
+    _initListenersAdded=true;
+    document.addEventListener('mousemove',onMM);
+    document.addEventListener('mouseup',onMU);
+
+    // Pan drag on background — mousedown on .gc only
+    var gw=document.getElementById('gw');
+    gw.addEventListener('mousedown',function(e){
+      if(!e.target.classList.contains('gc'))return;
+      panStart={x:e.clientX,y:e.clientY,sl:gw.scrollLeft,st:gw.scrollTop};
+      panMoved=false;
+      gw.style.cursor='grabbing';
       e.preventDefault();
-      var id=open.id;
-      if(id==='mo-tk')sTk();
-      else if(id==='mo-per')sPer();
-      else if(id==='mo-sc')sSc();
-      else if(id==='mo-topic')sTopic();
-      else if(id==='mo-ttype')sTkType();
-      else if(id==='mo-prj'){var btn=document.getElementById('prj-save-btn');if(btn)btn.click();}
-      else if(id==='mo-ev')sEv();
-    }
-  });
+    });
+    document.addEventListener('mousemove',function(e){
+      if(!panStart)return;
+      var dx=e.clientX-panStart.x, dy=e.clientY-panStart.y;
+      if(Math.abs(dx)>3||Math.abs(dy)>3)panMoved=true;
+      gw.scrollLeft=panStart.sl-dx;
+      gw.scrollTop=panStart.st-dy;
+    });
+    document.addEventListener('mouseup',function(){
+      if(!panStart)return;
+      panStart=null;
+      gw.style.cursor='';
+    });
+    document.addEventListener('click',onDC);
+    document.addEventListener('keydown',function(e){
+      if(e.key==='Escape'){document.querySelectorAll('.mo.open').forEach(function(m){m.classList.remove('open');});cConf();}
+      if((e.ctrlKey||e.metaKey)&&e.key==='s'){e.preventDefault();fbSaveVersion();}
+      if(e.key==='Enter'&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){
+        // Don't trigger on textarea or buttons
+        if(e.target.tagName==='TEXTAREA'||e.target.tagName==='BUTTON')return;
+        var open=document.querySelector('.mo.open');
+        if(!open)return;
+        e.preventDefault();
+        var id=open.id;
+        if(id==='mo-tk')sTk();
+        else if(id==='mo-per')sPer();
+        else if(id==='mo-sc')sSc();
+        else if(id==='mo-topic')sTopic();
+        else if(id==='mo-ttype')sTkType();
+        else if(id==='mo-prj'){var btn=document.getElementById('prj-save-btn');if(btn)btn.click();}
+        else if(id==='mo-ev')sEv();
+      }
+    });
+  }
   fmSel('sm',1);fmSel('em',1);fmSel('evm1',1);fmSel('evm2',1);
-  // Try auto-load data.json from same folder
-  try{
-    fetch('data.json?_='+Date.now())
-      .then(function(r){if(!r.ok)throw new Error('not found');return r.json();})
-      .then(function(imported){
-        if(imported._ganttmator)onJIData(imported);
-        rAll();
-        if(imported._ganttmator)toast('data.json נטען אוטומטית ✓');
-      })
-      .catch(function(){rAll();});
-  }catch(e){rAll();}
+  rAll();
 }
 
-function save(){localStorage.setItem('g5',JSON.stringify(S));}
+var _fbSaveTimer=null;
+var _suppressCloudSave=false;
+function saveLocal(){localStorage.setItem('g5',JSON.stringify(S));}
+function save(){
+  // Persist locally immediately, then auto-save to the cloud silently.
+  // The "cloud saved" status only shows when the user presses the cloud button.
+  localStorage.setItem('g5',JSON.stringify(S));
+  if(_suppressCloudSave||!currentGanttId)return;
+  clearTimeout(_fbSaveTimer);
+  _fbSaveTimer=setTimeout(function(){fbSaveVersion(true);},2000);
+}
 function isMobile(){return window.innerWidth<=768;}
 var _resizeTimer=null;
 window.addEventListener('resize',function(){
@@ -1066,13 +1549,13 @@ function rAll(){
       epDiv.innerHTML=html;
       epDiv.style.display='block';
     } else {
-      sub.textContent='התחל גאנט חדש או טען קובץ גיבוי קיים';
+      sub.textContent='בחרו גאנט או צרו אחד חדש';
       epDiv.style.display='none';
     }
     return;
   }
   emp.style.display='none';gr.style.display='block';
-  document.getElementById('plbl').textContent=p.name;
+  document.getElementById('plbl').textContent=currentGanttName||p.name;
   ensureNoneTopic(p);
   var gw=document.getElementById('gw');
   var savedSL=gw?gw.scrollLeft:0, savedST=gw?gw.scrollTop:0;
@@ -1209,16 +1692,32 @@ function rBody(p){
 
   // Build rendering order: all topics (including virtual "ללא נושא") 
   var rendered=[];
-  var topics=p.topics||[];
 
-  topics.forEach(function(topic){
-    var tScopes=scopes.filter(function(sc){return sc.topicId===topic.id;});
-    if(tScopes.length===0)return;
-    rendered.push({type:'topic',topic:topic});
-    if(!topic.collapsed){
-      tScopes.forEach(function(sc){rendered.push({type:'scope',sc:sc});});
-    }
-  });
+  if(viewMode==='timeline'&&timelineValue!==''){
+    // Flat order: keep only events (scopes) that contain a matching mission,
+    // ranked by that scope's earliest matching mission start.
+    var matching=[];
+    scopes.forEach(function(sc){
+      var best=null;
+      (sc.tasks||[]).forEach(function(tk){
+        var hit=(timelineBy==='type')?(tk.taskType===timelineValue)
+                                      :((tk.personId||sc.personId)===timelineValue);
+        if(hit){var st=awT(tk,true);if(best===null||st<best)best=st;}
+      });
+      if(best!==null)matching.push({sc:sc,rank:best});
+    });
+    matching.sort(function(a,b){return a.rank-b.rank;});
+    matching.forEach(function(m){rendered.push({type:'scope',sc:m.sc});});
+  } else {
+    topics.forEach(function(topic){
+      var tScopes=scopes.filter(function(sc){return sc.topicId===topic.id;});
+      if(tScopes.length===0)return;
+      rendered.push({type:'topic',topic:topic});
+      if(!topic.collapsed){
+        tScopes.forEach(function(sc){rendered.push({type:'scope',sc:sc});});
+      }
+    });
+  }
 
   var scIdx=0;
   var tDragFrom=null;
@@ -1229,6 +1728,12 @@ function rBody(p){
     // scope item
     var sc=item.sc;
     var tasks=sc.tasks||[];
+    // Legend "hide" mode: hide the whole event if it has NO matching mission;
+    // events that DO have one keep all their missions (the surrounding types stay visible).
+    if(legendHideMode&&activeTypeFilters.size>0){
+      var hasMatch=tasks.some(function(tk){return activeTypeFilters.has(tk.taskType);});
+      if(!hasMatch)return;
+    }
     packTasks(tasks);
     var count=1;
     for(var tk2i=0;tk2i<tasks.length;tk2i++){count=Math.max(count,(tasks[tk2i]._track||0)+1);}
@@ -1242,7 +1747,7 @@ function rBody(p){
     var topicIds2=(p.topics||[]).map(function(t){return t.id;});
     var tid=sc.topicId&&topicIds2.indexOf(sc.topicId)>=0?sc.topicId:null;
     var isVirtualNone=false;
-    if(tid){
+    if(tid&&viewMode!=='timeline'){
       scRow.classList.add('in-topic');
       scRow.dataset.topicid=tid;
     }
@@ -1257,7 +1762,7 @@ function rBody(p){
       +'<div class="ls" onclick="event.stopPropagation();toggleScopeSelect(\''+sc.id+'\')" title="לחץ לסימון תכולה">'+sc.name+'</div></div>'
       +'<div class="sc-acts"><button class="ib" onclick="event.stopPropagation();oSc(\''+sc.id+'\')" title="ערוך תכולה">✏️</button><button class="ib" onclick="event.stopPropagation();oTk(null,\''+sc.id+'\')" title="הוסף משימה">＋</button></div>'
       +(sc.desc||sc.notes?'<button class="sc-info-btn" onclick="event.stopPropagation();showScInfo(this,\''+sc.id+'\')" onmouseenter="showScInfoTT(this,\''+sc.id+'\')" onmouseleave="hideScInfoTT()" style="background:none;border:none;cursor:pointer;padding:0 2px;color:var(--text3);opacity:.5;flex-shrink:0;display:flex;align-items:center"><svg width=\"10\" height=\"10\" viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><circle cx=\"6\" cy=\"6\" r=\"5.25\"/><path d=\"M6 8.5v.01\" stroke-linecap=\"round\"/><path d=\"M6 6.8c0-1.3 1.5-1.1 1.5-2.3a1.5 1.5 0 10-3 0\" stroke-linecap=\"round\"/></svg></button>':'')
-      +'<span class="dh" style="cursor:grab;opacity:.5;font-size:13px;padding:0 3px 0 6px;user-select:none;flex-shrink:0">&#8285;</span>';
+      +(viewMode==='timeline'?'':'<span class="dh" style="cursor:grab;opacity:.5;font-size:13px;padding:0 3px 0 6px;user-select:none;flex-shrink:0">&#8285;</span>');
 
     // hlTopic only via overlay hover (not row hover)
 
@@ -1286,6 +1791,7 @@ function rBody(p){
         e.preventDefault();
         row.classList.remove('scope-drop-active');
         if(tDragFrom!==null)return;
+        if(viewMode==='timeline')return; // order is time-driven; manual reorder disabled
         if(sDragFrom===null||sDragFrom===idx)return;
         var p2=pr();if(!p2)return;
         snapshot();
@@ -1320,6 +1826,16 @@ function rBody(p){
     }
     body.appendChild(scRow);
   });
+
+  // Timeline mode with no matching events
+  if(viewMode==='timeline'&&rendered.length===0&&scopes.length>0){
+    var tov=document.createElement('div');
+    tov.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;pointer-events:none;padding-top:160px';
+    tov.innerHTML='<div style="font-size:13px;font-weight:700;color:var(--text2)">אין אירועים עם '+(timelineBy==='type'?'סוג המשימה':'המשאב')+' הזה</div>'
+      +'<div style="font-size:11px;color:var(--text3)">בחרו ערך אחר או חזרו לתצוגה לפי נושא</div>';
+    body.style.position='relative';
+    body.appendChild(tov);
+  }
 
   // Empty scopes overlay
   if(scopes.length===0){
@@ -1668,7 +2184,7 @@ function drawTopicSpines(p){
     (function(t){
       ov.style.pointerEvents='auto';
       ov.style.cursor='pointer';
-      ov.title='לחץ לסינון נושא';
+      ov.title=topicObj.name+' — לחץ לסינון נושא';
       if(selectedTopics.has(t)) ov.style.outline='2px solid rgba(255,255,255,.8)';
       ov.addEventListener('click',function(){toggleTopicSelect(t);});
     })(tid);
@@ -1735,12 +2251,17 @@ function onBMD(e,tk,scid){if(isMobile())return;
   while(el&&!el.classList.contains('gc'))el=el.parentElement;
   if(el&&el.dataset.col!==undefined)startCol=parseInt(el.dataset.col);
   drag={mode:isR?'resize':'drag',type:'task',tid:tk.id,scid:scid,side:side,sx:e.clientX,origCol:startCol,lastDCells:0,orig:{sy:tk.sy,sq:tk.sq,sm:tk.sm,sw:tk.sw,ey:tk.ey,eq:tk.eq,em:tk.em,ew:tk.ew},moved:false};
-  // If task has a dep and we're dragging (not resizing end), freeze lines at current bar position
-  if(tk.depId&&!isR){
-    var _origBar=document.getElementById('b-'+tk.id);
-    if(_origBar){
-      // Create a lightweight proxy with frozen cs/ce
-      drag.lockedBar={dataset:{cs:_origBar.dataset.cs,ce:_origBar.dataset.ce}};
+  // When moving (not resizing), drag the whole connected chain together
+  if(!isR){
+    var _pCh=pr();
+    if(_pCh){
+      drag.chain=getChainTasks(_pCh,tk.id).map(function(m){
+        return {tk:m.tk,scid:m.sc.id,sa:awT(m.tk,true),ea:awT(m.tk,false)};
+      });
+      if(drag.chain.length){
+        drag.chainMinStart=drag.chain[0].sa;
+        for(var _ci=1;_ci<drag.chain.length;_ci++)if(drag.chain[_ci].sa<drag.chainMinStart)drag.chainMinStart=drag.chain[_ci].sa;
+      }
     }
   }
   e.stopPropagation();
@@ -1797,6 +2318,39 @@ function updateDragLines(bar){
 function removeDragLines(){
   document.querySelectorAll('.drag-col-s,.drag-col-e').forEach(function(el){el.classList.remove('drag-col-s','drag-col-e');});
   document.querySelectorAll('.drag-hdr').forEach(function(el){el.classList.remove('drag-hdr');});
+}
+
+// Return every task in the connected dependency chain that contains `tid`
+// (following depId links in both directions, across scopes).
+function getChainTasks(p,tid){
+  var all=[],byId={};
+  (p.scopes||[]).forEach(function(sc){(sc.tasks||[]).forEach(function(t){byId[t.id]={tk:t,sc:sc};all.push(t);});});
+  if(!byId[tid])return [];
+  var comp={},stack=[tid];
+  while(stack.length){
+    var id=stack.pop();
+    if(comp[id])continue;comp[id]=true;
+    var node=byId[id];if(!node)continue;
+    if(node.tk.depId&&byId[node.tk.depId]&&!comp[node.tk.depId])stack.push(node.tk.depId);
+    for(var i=0;i<all.length;i++){if(all[i].depId===id&&!comp[all[i].id])stack.push(all[i].id);}
+  }
+  var res=[];
+  for(var k=0;k<all.length;k++){if(comp[all[k].id])res.push(byId[all[k].id]);}
+  return res;
+}
+function updTkBar(tk){
+  var bar=document.getElementById('b-'+tk.id);
+  if(!bar)return;
+  var vr=viewRange();
+  var nsa=awT(tk,true),nea=awT(tk,false);
+  if(nsa>vr.e||nea<vr.s){bar.style.display='none';}
+  else{
+    bar.style.display='';
+    var cs=Math.max(nsa,vr.s)-vr.s,ce=Math.min(nea,vr.e)-vr.s;
+    bar.style.right='calc('+cs+'*var(--cw) + 2px)';
+    bar.style.width='calc('+(ce-cs+1)+'*var(--cw) - 4px)';
+    bar.dataset.cs=cs;bar.dataset.ce=ce;
+  }
 }
 
 function onMM(e){
@@ -1883,33 +2437,37 @@ function onMM(e){
   var orig=drag.orig;
   var sa=awT(orig,true),ea=awT(orig,false);
   if(drag.mode==='drag'){
-    var span=ea-sa,ns=Math.max(0,sa-dCells),ne=ns+span;
-    var sp=absToPos(ns),ep=absToPos(ne);
-    tk.sy=sp.year;tk.sq=sp.q;tk.sm=sp.m;tk.sw=sp.w;
-    tk.ey=ep.year;tk.eq=ep.q;tk.em=ep.m;tk.ew=ep.w;
+    // Move the whole connected chain by the same amount, keeping relative offsets
+    var shift=-dCells;
+    if(drag.chain&&drag.chain.length){
+      if(drag.chainMinStart+shift<0)shift=-drag.chainMinStart;
+      for(var cm=0;cm<drag.chain.length;cm++){
+        var m=drag.chain[cm];
+        var msp=absToPos(m.sa+shift),mep=absToPos(m.ea+shift);
+        m.tk.sy=msp.year;m.tk.sq=msp.q;m.tk.sm=msp.m;m.tk.sw=msp.w;
+        m.tk.ey=mep.year;m.tk.eq=mep.q;m.tk.em=mep.m;m.tk.ew=mep.w;
+        updTkBar(m.tk);
+      }
+    } else {
+      var span=ea-sa,ns=Math.max(0,sa-dCells),ne=ns+span;
+      var sp=absToPos(ns),ep=absToPos(ne);
+      tk.sy=sp.year;tk.sq=sp.q;tk.sm=sp.m;tk.sw=sp.w;
+      tk.ey=ep.year;tk.eq=ep.q;tk.em=ep.m;tk.ew=ep.w;
+      updTkBar(tk);
+    }
   } else if(drag.side==='s'){
     var ns=Math.min(ea,sa-dCells);
     var sp=absToPos(Math.max(0,ns));
     tk.sy=sp.year;tk.sq=sp.q;tk.sm=sp.m;tk.sw=sp.w;
+    updTkBar(tk);
+    liveUpdateDeps(p,tk.id);
   } else {
     var ne=Math.max(sa,ea-dCells);
     var ep=absToPos(ne);
     tk.ey=ep.year;tk.eq=ep.q;tk.em=ep.m;tk.ew=ep.w;
+    updTkBar(tk);
+    liveUpdateDeps(p,tk.id);
   }
-  var bar=document.getElementById('b-'+tk.id);
-  if(bar){
-    var vr=viewRange();
-    var nsa=awT(tk,true),nea=awT(tk,false);
-    if(nsa>vr.e||nea<vr.s){bar.style.display='none';}
-    else{
-      bar.style.display='';
-      var cs=Math.max(nsa,vr.s)-vr.s,ce=Math.min(nea,vr.e)-vr.s;
-      bar.style.right='calc('+cs+'*var(--cw) + 2px)';
-      bar.style.width='calc('+(ce-cs+1)+'*var(--cw) - 4px)';
-      bar.dataset.cs=cs;bar.dataset.ce=ce;
-    }
-  }
-  liveUpdateDeps(p,tk.id);
 }
 
 function liveUpdateDeps(p,changedId){
@@ -2170,7 +2728,7 @@ function applyTypeFilter(){
   document.querySelectorAll('.tbar').forEach(function(bar){
     var tkid=bar.id.replace('b-','');
     var tk=(hasTypeFilter||hasScopeFilter||hasTopicFilter)?findTk(p,tkid):null;
-    var passType=!hasTypeFilter||(tk&&activeTypeFilters.has(tk.taskType));
+    var passType=!hasTypeFilter||legendHideMode||(tk&&activeTypeFilters.has(tk.taskType));
     var passScope=!hasScopeFilter||selectedTaskIds[tkid];
     var passTopic=!hasTopicFilter||topicTaskIds[tkid];
     var passCol=!hasColFilter||(parseInt(bar.dataset.cs)<=activeColFilter.e&&parseInt(bar.dataset.ce)>=activeColFilter.s);
@@ -2200,6 +2758,7 @@ function applyTypeFilter(){
 function toggleTypeFilter(type){
   if(activeTypeFilters.has(type))activeTypeFilters.delete(type);
   else activeTypeFilters.add(type);
+  if(legendHideMode){var p=pr();if(p){var gw=document.getElementById('gw');var sl=gw?gw.scrollLeft:0,st=gw?gw.scrollTop:0;rBody(p);if(gw){gw.scrollLeft=sl;gw.scrollTop=st;}}} // hide mode needs a real re-layout
   applyTypeFilter();
   rTypeList();
   renderLegend();
@@ -2207,6 +2766,7 @@ function toggleTypeFilter(type){
 
 function clearTypeFilters(){
   activeTypeFilters.clear();
+  if(legendHideMode){var p=pr();if(p){var gw=document.getElementById('gw');var sl=gw?gw.scrollLeft:0,st=gw?gw.scrollTop:0;rBody(p);if(gw){gw.scrollLeft=sl;gw.scrollTop=st;}}}
   applyTypeFilter();
   rTypeList();
   renderLegend();
@@ -2335,6 +2895,28 @@ var ICONS=[
 ];
 
 var selIcon=ICONS[0];
+
+// Icons available for naming a whole gantt (cloud workspace)
+var GANTT_ICONS=['📊','📈','📅','📋','🗂️','🎯','🚀','⭐','🏆','🔥','💼','🏗️','🛠️','⚙️','🌍','🎨','💡','📌','🔔','🧭','🦅','🐝','🦁','🐬','🌸','💎','📱','☕','⚡','🎸','🥇','🏁','🚩','🎀','🎪','🧩','📦','🗓️','✅','📍'];
+var selGanttIcon='📊';
+function fbRenderGanttIcons(sel){
+  var grid=document.getElementById('gantt-icon-grid');
+  if(!grid)return;
+  if(!grid.children.length){
+    grid.innerHTML=GANTT_ICONS.map(function(ic,i){
+      return'<div class="ick" data-gi="'+i+'" style="font-size:20px">'+ic+'</div>';
+    }).join('');
+    grid.querySelectorAll('.ick').forEach(function(el){
+      el.addEventListener('click',function(){
+        selGanttIcon=GANTT_ICONS[+el.dataset.gi];
+        grid.querySelectorAll('.ick').forEach(function(x){x.classList.toggle('sel',x===el);});
+      });
+    });
+  }
+  grid.querySelectorAll('.ick').forEach(function(el){
+    el.classList.toggle('sel',GANTT_ICONS[+el.dataset.gi]===sel);
+  });
+}
 
 function renderIconGrid(sel){
   var grid=document.getElementById('icon-grid');
@@ -2689,6 +3271,7 @@ function toggleTopicSelect(tid){
   else selectedTopics.add(tid);
   applyTypeFilter();
   updateTopicOverlayVisuals();
+  rTopicList();
 }
 
 function updateTopicOverlayVisuals(){
@@ -2714,6 +3297,7 @@ function clearTopicSelect(){
   selectedTopics.clear();
   updateTopicOverlayVisuals();
   applyTypeFilter();
+  rTopicList();
 }
 
 function clearAllFilters(){
@@ -2827,11 +3411,11 @@ function renderLegend(){
       }).join('');
     }
     leg.innerHTML='<div id="legend-stub" style="display:flex;flex-direction:column;gap:2px;padding:3px 8px;align-items:flex-start;width:100vw;">'
-      +'<div style="display:flex;align-items:center;gap:4px;justify-content:flex-start;">'+mkItems(row1)+'</div>'
+      +'<div style="display:flex;align-items:center;gap:4px;justify-content:flex-start;">'+viewBtnHtml()+mkItems(row1)+'</div>'
       +(row2.length?'<div style="display:flex;align-items:center;gap:4px;justify-content:flex-start;">'+mkItems(row2)+'</div>':'')
       +'</div>';
   } else {
-    leg.innerHTML='<div id="legend-stub">'+items+'</div>';
+    leg.innerHTML='<div id="legend-stub">'+viewBtnHtml()+items+'</div>';
   }
 
   // Attach click via delegation
@@ -2848,6 +3432,99 @@ function renderLegend(){
   applyTypeFilter._inLegend=false;
   // Restore horizontal scroll position of legend-stub
   if(window._fixCols)window._fixCols();
+}
+// ===== View menu (sort/order + legend filter mode) =====
+function viewBtnHtml(){
+  var active=(viewMode!=='subject')||legendHideMode;
+  return '<button id="view-menu-btn" class="lg-viewbtn'+(active?' on':'')+'" onclick="toggleViewMenu(event)" title="תצוגה, מיון וסינון">&#8645; תצוגה</button>';
+}
+function applyView(){
+  var p=pr();
+  var gw=document.getElementById('gw');
+  var sl=gw?gw.scrollLeft:0, st=gw?gw.scrollTop:0;
+  renderLegend();
+  if(p)rBody(p);
+  if(gw){gw.scrollLeft=sl;gw.scrollTop=st;}
+}
+function toggleViewMenu(e){
+  if(e)e.stopPropagation();
+  var m=document.getElementById('view-menu');
+  if(!m)return;
+  if(m.style.display==='block'){closeViewMenu();return;}
+  var btn=document.getElementById('view-menu-btn');
+  syncViewMenu();
+  m.style.display='block';
+  var r=btn?btn.getBoundingClientRect():null;
+  var mw=m.offsetWidth||266;
+  if(r){
+    m.style.top=(r.bottom+6)+'px';
+    var left=r.right-mw;
+    if(left<8)left=8;
+    m.style.left=left+'px';
+  }
+  setTimeout(function(){document.addEventListener('click',outsideViewMenu);},0);
+}
+function outsideViewMenu(e){
+  var m=document.getElementById('view-menu');
+  if(m&&!m.contains(e.target)&&(!e.target.closest||!e.target.closest('#view-menu-btn'))){closeViewMenu();}
+}
+function closeViewMenu(){
+  var m=document.getElementById('view-menu');
+  if(m)m.style.display='none';
+  document.removeEventListener('click',outsideViewMenu);
+}
+function syncViewMenu(){
+  var m=document.getElementById('view-menu');if(!m)return;
+  m.querySelectorAll('input[name="vm-order"]').forEach(function(r){r.checked=(r.value===viewMode);});
+  m.querySelectorAll('input[name="vm-legend"]').forEach(function(r){r.checked=(legendHideMode?r.value==='hide':r.value==='dim');});
+  var opts=document.getElementById('vm-timeline-opts');
+  if(opts)opts.style.display=(viewMode==='timeline')?'block':'none';
+  var bt=document.getElementById('vm-by-type'),br=document.getElementById('vm-by-res');
+  if(bt)bt.classList.toggle('on',timelineBy==='type');
+  if(br)br.classList.toggle('on',timelineBy==='resource');
+  populateViewValue();
+}
+function viewValueOptions(){
+  var p=pr();if(!p)return [];
+  if(timelineBy==='type'){
+    return (getTkTypes?getTkTypes():ETYPES.slice()).map(function(t){return {v:t,label:t};});
+  }
+  return (p.people||[]).map(function(pe){return {v:pe.id,label:resName(pe)};});
+}
+function populateViewValue(){
+  var sel=document.getElementById('vm-value');if(!sel)return;
+  var opts=viewValueOptions();
+  if(!timelineValue&&opts.length)timelineValue=opts[0].v;
+  sel.innerHTML=opts.map(function(o){
+    var v=String(o.v);
+    return '<option value="'+v.replace(/"/g,'&quot;')+'"'+(v===String(timelineValue)?' selected':'')+'>'+o.label+'</option>';
+  }).join('');
+  if(opts.length)sel.value=String(timelineValue);
+}
+function setViewMode(mode){
+  viewMode=mode;
+  if(mode==='timeline'){
+    var opts=viewValueOptions();
+    if(!timelineValue&&opts.length)timelineValue=opts[0].v;
+  }
+  syncViewMenu();
+  applyView();
+}
+function setTimelineBy(by){
+  if(timelineBy===by)return;
+  timelineBy=by;
+  timelineValue='';
+  syncViewMenu();
+  if(viewMode==='timeline')applyView();
+}
+function setTimelineValue(v){
+  timelineValue=v;
+  if(viewMode==='timeline')applyView();
+}
+function setLegendMode(mode){
+  legendHideMode=(mode==='hide');
+  syncViewMenu();
+  applyView();
 }
 function toggleTkTypeDrop(){
   var drop=document.getElementById('tktype-drop');
@@ -3000,16 +3677,19 @@ function rTopicList(){
 
   function makeTRow(topic,isNone){
     var row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:var(--rsm);margin-bottom:2px;cursor:default;transition:background .15s;';
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:var(--rsm);margin-bottom:2px;cursor:default;transition:background .15s;'
+      +(selectedTopics.has(topic.id)?'background:rgba(79,110,247,.14);':'');
     var isDel=!topic.isNone;
     row.innerHTML=(topic.isNone?'':'<span class="dh" style="cursor:grab;opacity:.4;font-size:12px;user-select:none">&#8285;</span>')
-      +'<div style="width:10px;height:10px;border-radius:2px;background:'+(topic.isNone?'var(--text3)':'var(--accent)')+';flex-shrink:0"></div>'
-      +'<span style="font-size:12px;font-weight:500;flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+topic.name+'</span>'
+      +'<div style="display:flex;align-items:center;gap:6px;flex:1;min-width:0;cursor:pointer" onclick="toggleTopicSelect(\''+topic.id+'\')" title="לחץ לסינון נושא">'
+        +'<div style="width:10px;height:10px;border-radius:2px;background:'+(topic.isNone?'var(--text3)':'var(--accent)')+';flex-shrink:0'+(selectedTopics.has(topic.id)?';outline:2px solid var(--accent);outline-offset:1px':'')+'"></div>'
+        +'<span style="font-size:12px;font-weight:'+(selectedTopics.has(topic.id)?'700':'500')+';flex:1;color:'+(selectedTopics.has(topic.id)?'var(--accent)':'var(--text)')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+topic.name+'</span>'
+      +'</div>'
       +(isDel?'<span style="font-size:10px;color:var(--text3);cursor:pointer;padding:1px 4px;border-radius:3px" onclick="event.stopPropagation();oTopic(\''+topic.id+'\')">✏️</span>'
         +'<span style="font-size:10px;color:var(--text3);cursor:pointer;padding:1px 4px" onclick="event.stopPropagation();delTopicFromBubble(\''+topic.id+'\')">✕</span>':'');
     if(!isNone){
-      row.addEventListener('mouseenter',function(){row.style.background='var(--surface2)';});
-      row.addEventListener('mouseleave',function(){row.style.background='transparent';});
+      row.addEventListener('mouseenter',function(){if(!selectedTopics.has(topic.id))row.style.background='var(--surface2)';});
+      row.addEventListener('mouseleave',function(){if(!selectedTopics.has(topic.id))row.style.background='transparent';});
       // Drag to reorder
       row.draggable=false;
       var dh=row.querySelector('.dh');
@@ -3431,6 +4111,7 @@ function oSettings(){
   document.getElementById('pastel-val').textContent=v+'%';
   updPastelPreview(v);
   updSettingsUI();
+  fbRenderVersionHistory();
   oMo('mo-settings');
 }
 
@@ -3952,7 +4633,47 @@ function toast(m,withUndo,type){
 }
 document.querySelectorAll('.mo').forEach(function(o){o.addEventListener('click',function(e){if(e.target===o)o.classList.remove('open');});});
 
-init();
+// Startup: gated behind Google sign-in
+var _appStarted=false;
+function startApp(){
+  if(_appStarted)return; _appStarted=true;
+  init();
+  if(currentGanttId){
+    fbLoadLatestVersion(currentGanttId).then(function(data){
+      if(data){
+        S=data;
+        if(!S.vs)S.vs={year:new Date().getFullYear(),q:1,numQ:4};
+        saveLocal();
+        rAll();
+      }else{
+        // Gantt no longer exists in cloud — go home
+        fbGoHome();
+      }
+    }).catch(function(){fbGoHome();});
+  }else{
+    fbShowPicker();
+  }
+}
+auth.onAuthStateChanged(function(user){
+  var gate=document.getElementById('auth-gate');
+  if(user && fbEmailAllowed(user.email)){
+    fbAuthUser=user;
+    if(gate)gate.style.display='none';
+    fbRenderUser(user);
+    startApp();
+  }else if(user){
+    // signed in but not permitted
+    var err=document.getElementById('auth-error');
+    if(err){err.textContent='\u05D0\u05D9\u05DF \u05D4\u05E8\u05E9\u05D0\u05EA \u05D2\u05D9\u05E9\u05D4 \u05DC\u05D7\u05E9\u05D1\u05D5\u05DF '+user.email;err.style.display='block';}
+    fbRenderUser(null);
+    auth.signOut();
+    if(gate)gate.style.display='flex';
+  }else{
+    fbAuthUser=null;
+    fbRenderUser(null);
+    if(gate)gate.style.display='flex';
+  }
+});
 // Pre-render icon grid so first open is instant
 setTimeout(function(){renderIconGrid(ICONS[0]);},200);
 
